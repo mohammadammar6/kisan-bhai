@@ -23,6 +23,8 @@ spec:
             - name: avp-tools
               mountPath: /custom-tools
       containers:
+        - name: argocd-repo-server
+          imagePullPolicy: IfNotPresent
         - name: argocd-vault-plugin
           image: quay.io/argoproj/argocd:v3.5.3
           imagePullPolicy: IfNotPresent

@@ -1,0 +1,42 @@
+services:
+  web:
+    build: .
+    container_name: kisan_bhai_web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  mysql:
+    image: mysql:8.0
+    container_name: kisan_bhai_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-kisan_bhai}
+      MYSQL_USER: ${MYSQL_USER:-kisan}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-kisan}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: kisan_bhai_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mysql_data:
+  redis_data:

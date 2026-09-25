@@ -1,0 +1,55 @@
+<section class="card farmer-updates-card shadow-sm mt-4" aria-labelledby="farmerUpdatesTitle">
+  <div class="card-body p-4 p-lg-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+      <div>
+        <span class="updates-eyebrow">🌾 {{ 'किसान समाचार और योजनाएँ' if language == 'hi' else 'FARMER UPDATE' }}</span>
+        <h2 id="farmerUpdatesTitle" class="h3 mb-1">{{ 'आपके राज्य की खबरें और योजनाएँ' if language == 'hi' else 'News and schemes for your state' }}</h2>
+        <p class="text-muted mb-0" id="farmerUpdatesSubtitle">{{ 'राज्य चुनें और कृषि से जुड़ी ताज़ा खबरें व सरकारी योजनाएँ देखें।' if language == 'hi' else 'Choose your state to see agriculture headlines and official scheme links.' }}</p>
+      </div>
+      <form method="post" action="{{ url_for('dashboard.set_state') }}" class="state-picker">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="farmerState" class="form-label small fw-semibold mb-1">{{ 'आपका राज्य / केंद्र शासित प्रदेश' if language == 'hi' else 'Your state / union territory' }}</label>
+        <div class="input-group">
+          <select class="form-select" id="farmerState" name="state" required>
+            <option value="">{{ 'राज्य चुनें' if language == 'hi' else 'Select your state' }}</option>
+            {% for item in states %}
+            <option value="{{ item }}" {{ 'selected' if farmer_state == item }}>{{ state_names_hi[item] if language == 'hi' else item }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-success" type="submit">{{ 'लागू करें' if language == 'hi' else 'Show updates' }}</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="farmerUpdatesEmpty" class="updates-empty {{ '' if farmer_state else 'd-flex' }}" {% if farmer_state %}hidden{% endif %}>
+      <span class="updates-empty-icon">📍</span>
+      <span>{{ 'अपने राज्य की खबरें और योजनाएँ देखने के लिए ऊपर राज्य चुनें।' if language == 'hi' else 'Select your state above to load local farming news and scheme links.' }}</span>
+    </div>
+
+    <div id="farmerUpdatesContent" class="row g-4" {% if not farmer_state %}hidden{% endif %}>
+      <div class="col-lg-7">
+        <div class="updates-panel h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="h5 mb-0">📰 {{ 'कृषि समाचार' if language == 'hi' else 'Agriculture news' }}</h3>
+            <span class="updates-tag">{{ 'ताज़ा' if language == 'hi' else 'LATEST' }}</span>
+          </div>
+          <div id="farmerNews" class="farmer-news-list" aria-live="polite">
+            <p class="text-muted mb-0">{{ 'खबरें लोड हो रही हैं…' if language == 'hi' else 'Loading local headlines…' }}</p>
+          </div>
+          <p class="news-credit mb-0 mt-3">{{ 'समाचार Google News खोज से; मूल स्रोत खोलने के लिए शीर्षक चुनें।' if language == 'hi' else 'Headlines via Google News. Open an item to visit its publisher.' }}</p>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="updates-panel schemes-panel h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="h5 mb-0">🏛️ {{ 'योजनाएँ और सरकारी सेवाएँ' if language == 'hi' else 'Schemes and services' }}</h3>
+            <span class="updates-tag scheme-tag">{{ 'आधिकारिक' if language == 'hi' else 'OFFICIAL' }}</span>
+          </div>
+          <div id="farmerSchemes" class="farmer-scheme-list" aria-live="polite"></div>
+          <p class="news-credit mb-0 mt-3">{{ 'पात्रता और आवेदन की जानकारी संबंधित सरकारी पोर्टल पर जाँचें।' if language == 'hi' else 'Check eligibility and application details on the linked government portals.' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="{{ url_for('static', filename='js/farmer_updates.js') }}"></script>

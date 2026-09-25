@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ crop.name }} - KISAN BHAI{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+<div>
+<h1>{{ crop.emoji }} {{ crop.name }}</h1>
+<p class="lead">{{ crop.description }}</p>
+</div>
+{% if current_user.is_authenticated %}
+{% if saved %}
+<span class="badge text-bg-success fs-6">✓ Saved</span>
+{% else %}
+<form method="post" action="{{ url_for('crops.save', crop_id=crop.id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-success">+ Add to My Crops</button>
+</form>
+{% endif %}
+{% else %}
+<a href="{{ url_for('auth.login') }}" class="btn btn-success">Login to save</a>
+{% endif %}
+</div>
+
+<div class="row g-3 mb-4">
+<div class="col-md-6"><div class="info-box"><strong>🌱 Soil</strong><p>{{ crop.soil }}</p></div></div>
+<div class="col-md-6"><div class="info-box"><strong>☀️ Climate</strong><p>{{ crop.climate }}</p></div></div>
+<div class="col-md-6"><div class="info-box"><strong>📅 Sowing</strong><p>{{ crop.sowing_period }}</p></div></div>
+<div class="col-md-6"><div class="info-box"><strong>🚜 Harvest</strong><p>{{ crop.harvest_period }}</p></div></div>
+</div>
+
+<h2>Step-by-step cultivation</h2>
+<div class="timeline">
+{% for step in crop.steps %}
+<div class="card mb-3 border-0 shadow-sm">
+<div class="card-body">
+<span class="badge bg-success">Step {{ step.sequence }}</span>
+<h4 class="mt-2">{{ step.title }}</h4>
+<p>{{ step.description }}</p>
+{% if step.duration_days %}<small class="text-muted">Typical planning duration: {{ step.duration_days }} days</small>{% endif %}
+</div>
+</div>
+{% endfor %}
+</div>
+
+<h2 class="mt-5">Irrigation guidance</h2>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Growth stage</th><th>Frequency</th><th>Water requirement</th><th>Notes</th></tr></thead>
+<tbody>
+{% for item in crop.irrigations %}
+<tr><td>{{ item.growth_stage }}</td><td>{{ item.frequency }}</td><td>{{ item.water_requirement }}</td><td>{{ item.description }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

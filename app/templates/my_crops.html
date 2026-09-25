@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}My Crops - KISAN BHAI{% endblock %}
+{% block content %}
+<h1>My Crops 👨‍🌾</h1>
+<p class="text-muted">Your selected cultivation plans.</p>
+<div class="row g-4">
+{% for uc in user_crops %}
+<div class="col-md-6 col-lg-4">
+<div class="card shadow-sm h-100">
+<div class="card-body">
+<div class="display-5">{{ uc.crop.emoji }}</div>
+<h3>{{ uc.crop.name }}</h3>
+<p><strong>Stage:</strong> {{ uc.current_stage }}</p>
+{% if uc.start_date %}<p><strong>Started:</strong>
+{% if language == 'hi' %}{{ uc.start_date.strftime("%d") }} {{ ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"][uc.start_date.month - 1] }} {{ uc.start_date.strftime("%Y") }}
+{% else %}{{ uc.start_date.strftime("%d %b %Y") }}{% endif %}</p>{% endif %}
+<a class="btn btn-outline-success" href="{{ url_for('crops.detail', crop_id=uc.crop.id) }}">View plan</a>
+<form method="post" action="{{ url_for('crops.remove', crop_id=uc.crop.id) }}" class="d-inline">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-outline-danger">Remove</button>
+</form>
+</div></div></div>
+{% else %}
+<div class="col-12"><div class="alert alert-info">No crops saved yet. Visit the crop library to add one.</div></div>
+{% endfor %}
+</div>
+{% endblock %}

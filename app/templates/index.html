@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}KISAN BHAI - Farmer Companion{% endblock %}
+{% block content %}
+<section class="hero p-5 rounded-4 mb-5">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <span class="badge bg-warning text-dark mb-3">Farming • Weather • Cultivation</span>
+      <h1 class="display-4 fw-bold">Your digital farming companion.</h1>
+      <p class="lead">Learn what to grow, when to sow, how to irrigate, and how weather can affect your crop.</p>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg">Start Farming Smarter</a>
+    </div>
+    <div class="col-lg-4 text-center display-1">🌾🌽🥔</div>
+  </div>
+</section>
+
+<h2 class="mb-4">Crop cultivation guides</h2>
+<div class="row g-4">
+{% for crop in crops %}
+<div class="col-md-6 col-lg-4">
+  <div class="card h-100 shadow-sm crop-card">
+    <div class="card-body">
+      <div class="display-5">{{ crop.emoji }}</div>
+      <h4>{{ crop.name }}</h4>
+      <p class="text-muted">{{ crop.description }}</p>
+      <a href="{{ url_for('crops.detail', crop_id=crop.id) }}" class="btn btn-outline-success">View guide</a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% include "_farmer_updates.html" %}
+{% endblock %}

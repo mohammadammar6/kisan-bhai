@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-vault-plugin
+  namespace: argocd
+data:
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: argocd-vault-plugin
+    spec:
+      allowConcurrency: true
+      discover:
+        find:
+          command: [sh, -c, "find . -name 'vault-secrets.yaml' -print -quit | grep -q ."]
+      generate:
+        command: [/custom-tools/argocd-vault-plugin]
+        args: [generate, "."]
+      lockRepo: false

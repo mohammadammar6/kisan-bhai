@@ -12,3 +12,4 @@ __pycache__
 .DS_Store
 *.log
 *.oci.tar
+k8s

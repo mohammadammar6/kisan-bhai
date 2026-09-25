@@ -181,6 +181,29 @@ spec:
             - sh
             - -c
             - until nc -z mysql 3306; do echo 'Waiting for MySQL'; sleep 2; done; until nc -z redis 6379; do echo 'Waiting for Redis'; sleep 2; done
+        - name: seed-crop-catalog
+          image: devopsusr/kisan-bhai:kind
+          imagePullPolicy: IfNotPresent
+          command: ["python", "seed.py"]
+          envFrom:
+            - configMapRef:
+                name: kisan-bhai-config
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: kisan-bhai-secrets
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: kisan-bhai-secrets
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kisan-bhai-secrets
+                  key: MYSQL_PASSWORD
       containers:
         - name: web
           image: devopsusr/kisan-bhai:kind

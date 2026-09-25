@@ -1,0 +1,26 @@
+global:
+  tlsDisable: true
+
+server:
+  standalone:
+    enabled: true
+  dataStorage:
+    enabled: true
+    size: 2Gi
+    storageClass: standard
+  serviceAccount:
+    create: true
+    name: vault
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+injector:
+  enabled: false
+
+ui:
+  enabled: true
+  serviceType: ClusterIP

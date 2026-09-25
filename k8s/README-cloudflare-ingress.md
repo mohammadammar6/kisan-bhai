@@ -2,6 +2,8 @@
 
 This setup routes `kisanbhai.shop` and `www.kisanbhai.shop` through Cloudflare Tunnel to the in-cluster NGINX ingress controller. cert-manager obtains a publicly trusted Let's Encrypt certificate using Cloudflare DNS-01 validation. No inbound router ports or public IP are required.
 
+> For the Argo CD deployment, Cloudflare credentials are rendered from Vault. Follow [README-argocd-vault.md](README-argocd-vault.md) to store them and sync the app. Don't create a competing Cloudflare Secret with `kubectl` when Argo CD manages the application.
+
 ## Install the controllers
 
 Run these against the intended kind cluster. The kind-specific ingress-nginx manifest installs the controller and its admission webhook:

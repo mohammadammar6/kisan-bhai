@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kisan-bhai
+  namespace: kisan-bhai
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - kisanbhai.shop
+        - www.kisanbhai.shop
+      secretName: kisanbhai-shop-tls
+  rules:
+    - host: kisanbhai.shop
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kisan-bhai
+                port:
+                  number: 5000
+    - host: www.kisanbhai.shop
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kisan-bhai
+                port:
+                  number: 5000

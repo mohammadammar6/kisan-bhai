@@ -115,6 +115,40 @@ The published image can be pulled with:
 docker pull devopsusr/kisan-bhai:latest
 ```
 
+### Local Kubernetes with kind
+
+`k8s/kind/stack.yaml` deploys the app, MySQL, and Redis in the `kisan-bhai` namespace. It uses the official `mysql:8.0` and `redis:7-alpine` images; the app image is built locally and loaded into kind, so Docker Hub credentials are not needed for a local cluster.
+
+When the container starts, it runs `seed.py` before Gunicorn. This inserts the built-in crop catalog and cultivation guides if the database is empty; an existing catalog is left unchanged. For running the app directly with Python rather than in Docker, run `python seed.py` once after configuring the database.
+
+Create the namespace and a local Secret (the random database passwords are kept outside the manifest):
+
+```bash
+kubectl create namespace kisan-bhai --dry-run=client -o yaml | kubectl apply -f -
+if ! kubectl -n kisan-bhai get secret kisan-bhai-secrets >/dev/null 2>&1; then
+  kubectl -n kisan-bhai create secret generic kisan-bhai-secrets \
+    --from-literal=SECRET_KEY="$(openssl rand -hex 32)" \
+    --from-literal=MYSQL_USER=kisan \
+    --from-literal=MYSQL_PASSWORD="$(openssl rand -hex 24)" \
+    --from-literal=MYSQL_ROOT_PASSWORD="$(openssl rand -hex 24)" \
+    --from-literal=OPENWEATHER_API_KEY="${OPENWEATHER_API_KEY:-}"
+fi
+```
+
+Build and load the app image for the architecture of the local kind node, then deploy:
+
+```bash
+docker buildx build --platform linux/arm64 --tag devopsusr/kisan-bhai:kind --load .
+kind load docker-image devopsusr/kisan-bhai:kind --name main-cluster
+kubectl apply -f k8s/kind/stack.yaml
+kubectl -n kisan-bhai rollout status statefulset/mysql
+kubectl -n kisan-bhai rollout status deployment/redis
+kubectl -n kisan-bhai rollout status deployment/kisan-bhai
+kubectl -n kisan-bhai port-forward service/kisan-bhai 5001:5000
+```
+
+Open http://localhost:5001. If your kind node is `amd64`, change the build platform to `linux/amd64`. Add `OPENWEATHER_API_KEY` to your shell before creating the Secret if you want weather data. MySQL data is stored in a kind persistent volume; Redis is used as a cache.
+
 ## Features
 
 Registration/login, six crop guides, cultivation steps, irrigation guidance, saved crops, browser location, current weather, five-day forecast, Redis weather caching, and rule-based weather-aware advice.

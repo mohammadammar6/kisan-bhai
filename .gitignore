@@ -6,3 +6,6 @@ venv/
 .pytest_cache/
 instance/
 .DS_Store
+k8s/manifests/secret.yaml
+k8s/manifests/cloudflare-api-token.yaml
+k8s/manifests/cloudflared.yaml

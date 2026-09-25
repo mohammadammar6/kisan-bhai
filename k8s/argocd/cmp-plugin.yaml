@@ -13,7 +13,7 @@ data:
       allowConcurrency: true
       discover:
         find:
-          command: [sh, -c, "find . -name 'vault-secrets.yaml' -print -quit | grep -q ."]
+          command: [sh, -c, "find . -name 'vault-secrets.yaml' -print -quit"]
       generate:
         command: [/custom-tools/argocd-vault-plugin]
         args: [generate, "."]

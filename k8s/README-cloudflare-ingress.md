@@ -16,6 +16,15 @@ kubectl wait --for=condition=Available deployment/cert-manager -n cert-manager -
 kubectl wait --for=condition=Available deployment/cert-manager-webhook -n cert-manager --timeout=180s
 ```
 
+For DNS-01 self-checks, make cert-manager use public recursive resolvers instead of the kind cluster's CoreDNS forwarder. This avoids failures when the host network's DNS resolver returns `SERVFAIL` for the domain's SOA lookup:
+
+```sh
+kubectl -n cert-manager patch deployment cert-manager --type=json -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53"},{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--dns01-recursive-nameservers-only"}]'
+kubectl -n cert-manager rollout status deployment/cert-manager --timeout=120s
+```
+
+These flags are included in the cert-manager controller arguments. Reapply them if you reinstall cert-manager from the upstream manifest.
+
 ## Configure certificate issuance
 
 Create a Cloudflare API Token limited to the `kisanbhai.shop` zone, with `Zone / DNS / Edit` and `Zone / Zone / Read` permissions. Keep this token private. Create the Kubernetes Secret without writing it to a tracked YAML file:
